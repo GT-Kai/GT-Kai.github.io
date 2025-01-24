@@ -1,0 +1,203 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Post2-Rosetta-Ligand_docking | GT-Kai的暗黑洞穴</title><meta name="author" content="GT-Kai,2975177159@qq.com"><meta name="copyright" content="GT-Kai"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Post-2  Rosetta-Ligand Docking完成Rosetta编译之后我们便可以进行分子对接，我将在这篇博文中记录完成Ligand Docking的整个过程。 1 任务阐述3r0r.pdb该蛋白质具有酶的活性，但存在几种小分子会与该蛋白质结合抑制蛋白酶活性。已知几种小分子的抑制活性，通过结合亲和力计算来验证抑制活性。 2 结果记录得出最终结果的命令是： 1&#x2F;home&#x2F;gt-lck&#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Post2-Rosetta-Ligand_docking">
+<meta property="og:url" content="http://example.com/2025/01/24/Post2-Rosetta-Ligand-docking/index.html">
+<meta property="og:site_name" content="GT-Kai的暗黑洞穴">
+<meta property="og:description" content="Post-2  Rosetta-Ligand Docking完成Rosetta编译之后我们便可以进行分子对接，我将在这篇博文中记录完成Ligand Docking的整个过程。 1 任务阐述3r0r.pdb该蛋白质具有酶的活性，但存在几种小分子会与该蛋白质结合抑制蛋白酶活性。已知几种小分子的抑制活性，通过结合亲和力计算来验证抑制活性。 2 结果记录得出最终结果的命令是： 1&#x2F;home&#x2F;gt-lck&#x2F;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/avatar.jpg">
+<meta property="article:published_time" content="2025-01-23T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-01-24T12:07:21.980Z">
+<meta property="article:author" content="GT-Kai">
+<meta property="article:tag" content="Gromacs, Rosetta, Linux, Pytorch, transformer">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/avatar.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Post2-Rosetta-Ligand_docking",
+  "url": "http://example.com/2025/01/24/Post2-Rosetta-Ligand-docking/",
+  "image": "http://example.com/img/avatar.jpg",
+  "datePublished": "2025-01-23T16:00:00.000Z",
+  "dateModified": "2025-01-24T12:07:21.980Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "GT-Kai",
+      "url": "http://example.com/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2025/01/24/Post2-Rosetta-Ligand-docking/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Post2-Rosetta-Ligand_docking',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">GT-Kai的暗黑洞穴</span></a><a class="nav-page-title" href="/"><span class="site-name">Post2-Rosetta-Ligand_docking</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Post2-Rosetta-Ligand_docking</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-01-23T16:00:00.000Z" title="发表于 2025-01-24 00:00:00">2025-01-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-01-24T12:07:21.980Z" title="更新于 2025-01-24 20:07:21">2025-01-24</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="Post-2-Rosetta-Ligand-Docking"><a href="#Post-2-Rosetta-Ligand-Docking" class="headerlink" title="Post-2  Rosetta-Ligand Docking"></a>Post-2  Rosetta-Ligand Docking</h1><p>完成Rosetta编译之后我们便可以进行分子对接，我将在这篇博文中记录完成Ligand Docking的整个过程。</p>
+<h2 id="1-任务阐述"><a href="#1-任务阐述" class="headerlink" title="1 任务阐述"></a>1 任务阐述</h2><p>3r0r.pdb该蛋白质具有酶的活性，但存在几种小分子会与该蛋白质结合抑制蛋白酶活性。已知几种小分子的抑制活性，通过结合亲和力计算来验证抑制活性。</p>
+<h2 id="2-结果记录"><a href="#2-结果记录" class="headerlink" title="2 结果记录"></a>2 结果记录</h2><p>得出最终结果的命令是：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/home/gt-lck/software/rosetta.binary.ubuntu.release-371/main/source/bin/rosetta_scripts.default.linuxgccrelease @ options -nstruct 5</span><br></pre></td></tr></table></figure>
+
+<p>这条命令涉及的文件包括options，options文件又涉及到蛋白质与配体合并后的pdb文件（3r0r_A_LIG.pdb）,可供Rosetta读取的配体的.params文件以及dock.xml，options如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#Pound signs indicate comments </span></span><br><span class="line"><span class="comment">#-in:file:s option imports the protein and ligand PDB structures</span></span><br><span class="line"><span class="comment">#-in:file:extra_res_fa option imports the parameters for the ligand</span></span><br><span class="line">-<span class="keyword">in</span></span><br><span class="line">	-file</span><br><span class="line">		-s 3r0r_A_LIG.pdb</span><br><span class="line">		-extra_res_fa LIG.params</span><br><span class="line"><span class="comment">#the packing options allow Rosetta to sample additional rotamers for</span></span><br><span class="line"><span class="comment">#protein sidechain angles chi 1 (ex1) and chi 2 (ex2) </span></span><br><span class="line"><span class="comment">#no_optH false tells Rosetta to optimize hydrogen placements</span></span><br><span class="line"><span class="comment">#flip_HNQ tells Rosetta to consider HIS,ASN,GLN hydrogen flips</span></span><br><span class="line"><span class="comment">#ignore_ligand_chi prevents Roseta from adding additional ligand rotamer</span></span><br><span class="line">-packing</span><br><span class="line">	-ex1</span><br><span class="line">	-ex2</span><br><span class="line">	-no_optH <span class="literal">false</span></span><br><span class="line">	-flip_HNQ <span class="literal">true</span></span><br><span class="line">	-ignore_ligand_chi <span class="literal">true</span></span><br><span class="line"><span class="comment">#parser:protocol locates the XML file for RosettaScripts</span></span><br><span class="line">-parser</span><br><span class="line">	-protocol dock.xml</span><br><span class="line"><span class="comment">#overwrite allows Rosetta to write over previous structures and scores</span></span><br><span class="line">-overwrite</span><br><span class="line"><span class="comment">#Ligand docking is not yet benchmarked with the updated scoring function</span></span><br><span class="line"><span class="comment">#This flag restores certain parameters to previously published values</span></span><br><span class="line">-mistakes</span><br><span class="line">	-restore_pre_talaris_2013_behavior <span class="literal">true</span></span><br><span class="line">-nstruct 5 </span><br></pre></td></tr></table></figure>
+
+<p>其中dock.xml文件又涉及到蛋白质配体复合物native.pdb（蛋白质配体自然复合物），dock.xml如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">&lt;<span class="variable constant_">ROSETTASCRIPTS</span>&gt;</span><br><span class="line">		<span class="language-xml"><span class="tag">&lt;<span class="name">SCOREFXNS</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">ScoreFunction</span> <span class="attr">name</span>=<span class="string">&quot;ligand_soft_rep&quot;</span> <span class="attr">weights</span>=<span class="string">&quot;ligand_soft_rep&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;/<span class="name">ScoreFunction</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">ScoreFunction</span> <span class="attr">name</span>=<span class="string">&quot;hard_rep&quot;</span> <span class="attr">weights</span>=<span class="string">&quot;ligand&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;/<span class="name">ScoreFunction</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">		<span class="tag">&lt;/<span class="name">SCOREFXNS</span>&gt;</span></span></span><br><span class="line">		<span class="language-xml"><span class="tag">&lt;<span class="name">LIGAND_AREAS</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">LigandArea</span> <span class="attr">name</span>=<span class="string">&quot;inhibitor_dock_sc&quot;</span> <span class="attr">chain</span>=<span class="string">&quot;X&quot;</span> <span class="attr">cutoff</span>=<span class="string">&quot;6.0&quot;</span> <span class="attr">add_nbr_radius</span>=<span class="string">&quot;true&quot;</span> <span class="attr">all_atom_mode</span>=<span class="string">&quot;false&quot;</span>/&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">LigandArea</span> <span class="attr">name</span>=<span class="string">&quot;inhibitor_final_sc&quot;</span> <span class="attr">chain</span>=<span class="string">&quot;X&quot;</span> <span class="attr">cutoff</span>=<span class="string">&quot;6.0&quot;</span> <span class="attr">add_nbr_radius</span>=<span class="string">&quot;true&quot;</span> <span class="attr">all_atom_mode</span>=<span class="string">&quot;false&quot;</span>/&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">LigandArea</span> <span class="attr">name</span>=<span class="string">&quot;inhibitor_final_bb&quot;</span> <span class="attr">chain</span>=<span class="string">&quot;X&quot;</span> <span class="attr">cutoff</span>=<span class="string">&quot;7.0&quot;</span> <span class="attr">add_nbr_radius</span>=<span class="string">&quot;false&quot;</span> <span class="attr">all_atom_mode</span>=<span class="string">&quot;true&quot;</span> <span class="attr">Calpha_restraints</span>=<span class="string">&quot;0.3&quot;</span>/&gt;</span></span></span><br><span class="line"><span class="language-xml">		<span class="tag">&lt;/<span class="name">LIGAND_AREAS</span>&gt;</span></span></span><br><span class="line">		<span class="language-xml"><span class="tag">&lt;<span class="name">INTERFACE_BUILDERS</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">InterfaceBuilder</span> <span class="attr">name</span>=<span class="string">&quot;side_chain_for_docking&quot;</span> <span class="attr">ligand_areas</span>=<span class="string">&quot;inhibitor_dock_sc&quot;</span>/&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">InterfaceBuilder</span> <span class="attr">name</span>=<span class="string">&quot;side_chain_for_final&quot;</span> <span class="attr">ligand_areas</span>=<span class="string">&quot;inhibitor_final_sc&quot;</span>/&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">InterfaceBuilder</span> <span class="attr">name</span>=<span class="string">&quot;backbone&quot;</span> <span class="attr">ligand_areas</span>=<span class="string">&quot;inhibitor_final_bb&quot;</span> <span class="attr">extension_window</span>=<span class="string">&quot;3&quot;</span>/&gt;</span></span></span><br><span class="line"><span class="language-xml">		<span class="tag">&lt;/<span class="name">INTERFACE_BUILDERS</span>&gt;</span></span></span><br><span class="line">		<span class="language-xml"><span class="tag">&lt;<span class="name">MOVEMAP_BUILDERS</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">MoveMapBuilder</span> <span class="attr">name</span>=<span class="string">&quot;docking&quot;</span> <span class="attr">sc_interface</span>=<span class="string">&quot;side_chain_for_docking&quot;</span> <span class="attr">minimize_water</span>=<span class="string">&quot;false&quot;</span>/&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">MoveMapBuilder</span> <span class="attr">name</span>=<span class="string">&quot;final&quot;</span> <span class="attr">sc_interface</span>=<span class="string">&quot;side_chain_for_final&quot;</span> <span class="attr">bb_interface</span>=<span class="string">&quot;backbone&quot;</span> <span class="attr">minimize_water</span>=<span class="string">&quot;false&quot;</span>/&gt;</span></span></span><br><span class="line"><span class="language-xml">		<span class="tag">&lt;/<span class="name">MOVEMAP_BUILDERS</span>&gt;</span></span></span><br><span class="line">		<span class="language-xml"><span class="tag">&lt;<span class="name">SCORINGGRIDS</span> <span class="attr">ligand_chain</span>=<span class="string">&quot;X&quot;</span> <span class="attr">width</span>=<span class="string">&quot;15&quot;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">ClassicGrid</span> <span class="attr">grid_name</span>=<span class="string">&quot;classic&quot;</span> <span class="attr">weight</span>=<span class="string">&quot;1.0&quot;</span>/&gt;</span></span></span><br><span class="line"><span class="language-xml">		<span class="tag">&lt;/<span class="name">SCORINGGRIDS</span>&gt;</span></span></span><br><span class="line">		<span class="language-xml"><span class="tag">&lt;<span class="name">MOVERS</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">Transform</span> <span class="attr">name</span>=<span class="string">&quot;transform&quot;</span> <span class="attr">chain</span>=<span class="string">&quot;X&quot;</span> <span class="attr">box_size</span>=<span class="string">&quot;7.0&quot;</span> <span class="attr">move_distance</span>=<span class="string">&quot;0.2&quot;</span> <span class="attr">angle</span>=<span class="string">&quot;20&quot;</span> <span class="attr">cycles</span>=<span class="string">&quot;500&quot;</span> <span class="attr">repeats</span>=<span class="string">&quot;1&quot;</span> <span class="attr">temperature</span>=<span class="string">&quot;5&quot;</span>/&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">HighResDocker</span> <span class="attr">name</span>=<span class="string">&quot;high_res_docker&quot;</span> <span class="attr">cycles</span>=<span class="string">&quot;6&quot;</span> <span class="attr">repack_every_Nth</span>=<span class="string">&quot;3&quot;</span> <span class="attr">scorefxn</span>=<span class="string">&quot;ligand_soft_rep&quot;</span> <span class="attr">movemap_builder</span>=<span class="string">&quot;docking&quot;</span>/&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">FinalMinimizer</span> <span class="attr">name</span>=<span class="string">&quot;final&quot;</span> <span class="attr">scorefxn</span>=<span class="string">&quot;hard_rep&quot;</span> <span class="attr">movemap_builder</span>=<span class="string">&quot;final&quot;</span>/&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">InterfaceScoreCalculator</span> <span class="attr">name</span>=<span class="string">&quot;add_scores&quot;</span> <span class="attr">chains</span>=<span class="string">&quot;X&quot;</span> <span class="attr">scorefxn</span>=<span class="string">&quot;hard_rep&quot;</span> <span class="attr">native</span>=<span class="string">&quot;native.pdb&quot;</span>/&gt;</span> </span></span><br><span class="line"><span class="language-xml">		<span class="tag">&lt;/<span class="name">MOVERS</span>&gt;</span></span></span><br><span class="line">		<span class="language-xml"><span class="tag">&lt;<span class="name">PROTOCOLS</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">Add</span> <span class="attr">mover_name</span>=<span class="string">&quot;transform&quot;</span>/&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">Add</span> <span class="attr">mover_name</span>=<span class="string">&quot;high_res_docker&quot;</span>/&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">Add</span> <span class="attr">mover_name</span>=<span class="string">&quot;final&quot;</span>/&gt;</span></span></span><br><span class="line"><span class="language-xml">			<span class="tag">&lt;<span class="name">Add</span> <span class="attr">mover_name</span>=<span class="string">&quot;add_scores&quot;</span>/&gt;</span></span></span><br><span class="line"><span class="language-xml">		<span class="tag">&lt;/<span class="name">PROTOCOLS</span>&gt;</span></span></span><br><span class="line">&lt;/<span class="variable constant_">ROSETTASCRIPTS</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<p>由于我做的是蛋白质与抑制剂之间的对接，我没有native.pdb。因此，我使用了其中之一个配体与蛋白质对接后排名第一的复合物作为native.pdb。</p>
+<h2 id="3-操作过程"><a href="#3-操作过程" class="headerlink" title="3 操作过程"></a>3 操作过程</h2><h3 id="step1：建立任务目录"><a href="#step1：建立任务目录" class="headerlink" title="step1：建立任务目录"></a>step1：建立任务目录</h3><p>在指定目录下建立‘docking’ ‘ligand_prep’ ‘protein_prep’三个目录，对应命令如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> docking</span><br><span class="line"><span class="built_in">mkdir</span> ligand_prep</span><br><span class="line"><span class="built_in">mkdir</span> protein_prep</span><br></pre></td></tr></table></figure>
+
+<p><img src="/.com//Users\Admin\AppData\Roaming\Typora\typora-user-images\image-20250124193128263.png" alt="Post2-1"></p>
+<h3 id="step2：准备蛋白质（protein-prep）"><a href="#step2：准备蛋白质（protein-prep）" class="headerlink" title="step2：准备蛋白质（protein_prep）"></a>step2：准备蛋白质（protein_prep）</h3><p>进入到protein_prep目录下，导入蛋白质pdb文件（3r0r.pdb）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd protein_prep</span><br><span class="line">ls</span><br></pre></td></tr></table></figure>
+
+<p><img src="/.com//documents\hexo-jason-blog\source_posts\Post2-Rosetta-Ligand-docking\Post2-2.jpg" alt="Post2-2"></p>
+<p>然后，使用clean_pdb.py 脚本剥离 PDB 中除所需蛋白质坐标以外的信息，’A’ 选项告诉脚本只获取链 A</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/home/gt-lck/software/rosetta.binary.ubuntu.release-371/main/tools/protein_tools/scripts/clean_pdb.py 3r0r.pdb A</span><br></pre></td></tr></table></figure>
+
+<p><img src="/.com//Users\Admin\AppData\Roaming\Typora\typora-user-images\image-20250124194302208.png" alt="image-20250124194302208"></p>
+<p>然后将生成的3r0r_A.pdb复制到docking目录中：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cp</span> 3r0r_A.pdb ../docking</span><br></pre></td></tr></table></figure>
+
+<h3 id="step3：准备配体分子（ligand-prep）"><a href="#step3：准备配体分子（ligand-prep）" class="headerlink" title="step3：准备配体分子（ligand_prep）"></a>step3：准备配体分子（ligand_prep）</h3><p>然后需要对配体分子Ligand.sdf（v2000）进行异构象计算，这一步可以在<a target="_blank" rel="noopener" href="http://carbon.structbio.vanderbilt.edu/index.php/bclconf%E4%B8%AD%E5%AE%8C%E6%88%90%EF%BC%8C%E6%9C%80%E7%BB%88%E5%BE%97%E5%88%B0Ligand_conformers.sdf%EF%BC%8C%E5%B0%86%E5%85%B6%E4%B8%80%E5%B9%B6%E6%94%BE%E5%85%A5%E5%88%B0ligand_prep%E7%9B%AE%E5%BD%95%E4%B8%8B%E3%80%82">http://carbon.structbio.vanderbilt.edu/index.php/bclconf中完成，最终得到Ligand_conformers.sdf，将其一并放入到ligand_prep目录下。</a></p>
+<p><img src="/.com//Users\Admin\AppData\Roaming\Typora\typora-user-images\image-20250124195259137.png" alt="image-20250124195259137"></p>
+<p>然后，生成一个 .params 文件和具有 Rosetta 原子类型的相关 PDB 构象。params 文件对于配体对接是必需的，因为 Rosetta 的数据库中没有自定义小分子的记录，命令如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python /home/gt-lck/software/rosetta.binary.ubuntu.release-371/main/source/scripts/python/public/molfile_to_params.py -n LIG -p LIG --conformers-in-one-file Ligand6_conformers.sdf</span><br></pre></td></tr></table></figure>
+
+<p>然后，将生成的文件复制到docking目录中。进入到docking目录中将3r0r_A.pdb和LIG.pdb合并为3r0r_A_LIG.pdb：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cp</span> LIG* ../docking/</span><br><span class="line"><span class="built_in">cd</span> ../docking/</span><br><span class="line"><span class="built_in">cat</span> 3r0r_A.pdb LIG.pdb &gt; 3r0r_A_LIG.pdb</span><br><span class="line">/home/gt-lck/software/rosetta.binary.ubuntu.release-371/main/source/bin/rosetta_scripts.default.linuxgccrelease @ options -nstruct 5</span><br></pre></td></tr></table></figure>
+
+<h3 id="step4：最终计算"><a href="#step4：最终计算" class="headerlink" title="step4：最终计算"></a>step4：最终计算</h3><p>将options、docking.xml、native.pdb复制到docking目录下，docking目录下完整结构如图所示：</p>
+<p><img src="/.com//Users\Admin\AppData\Roaming\Typora\typora-user-images\image-20250124200349430.png" alt="image-20250124200349430"></p>
+<p>最后运行计算命令得出结果score.sc：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/home/gt-lck/software/rosetta.binary.ubuntu.release-371/main/source/bin/rosetta_scripts.default.linuxgccrelease @ options -nstruct 5</span><br></pre></td></tr></table></figure>
+
+<p><img src="/.com//Users\Admin\AppData\Roaming\Typora\typora-user-images\image-20250124200701495.png" alt="image-20250124200701495"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">GT-Kai</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2025/01/24/Post2-Rosetta-Ligand-docking/">http://example.com/2025/01/24/Post2-Rosetta-Ligand-docking/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">GT-Kai的暗黑洞穴</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">GT-Kai</div><div class="author-info-description">生活费就像大姨妈</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Post-2-Rosetta-Ligand-Docking"><span class="toc-number">1.</span> <span class="toc-text">Post-2  Rosetta-Ligand Docking</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BB%BB%E5%8A%A1%E9%98%90%E8%BF%B0"><span class="toc-number">1.1.</span> <span class="toc-text">1 任务阐述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%BB%93%E6%9E%9C%E8%AE%B0%E5%BD%95"><span class="toc-number">1.2.</span> <span class="toc-text">2 结果记录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%93%8D%E4%BD%9C%E8%BF%87%E7%A8%8B"><span class="toc-number">1.3.</span> <span class="toc-text">3 操作过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#step1%EF%BC%9A%E5%BB%BA%E7%AB%8B%E4%BB%BB%E5%8A%A1%E7%9B%AE%E5%BD%95"><span class="toc-number">1.3.1.</span> <span class="toc-text">step1：建立任务目录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step2%EF%BC%9A%E5%87%86%E5%A4%87%E8%9B%8B%E7%99%BD%E8%B4%A8%EF%BC%88protein-prep%EF%BC%89"><span class="toc-number">1.3.2.</span> <span class="toc-text">step2：准备蛋白质（protein_prep）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step3%EF%BC%9A%E5%87%86%E5%A4%87%E9%85%8D%E4%BD%93%E5%88%86%E5%AD%90%EF%BC%88ligand-prep%EF%BC%89"><span class="toc-number">1.3.3.</span> <span class="toc-text">step3：准备配体分子（ligand_prep）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step4%EF%BC%9A%E6%9C%80%E7%BB%88%E8%AE%A1%E7%AE%97"><span class="toc-number">1.3.4.</span> <span class="toc-text">step4：最终计算</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/24/hello-world/" title="Hello World">Hello World</a><time datetime="2025-01-24T03:07:24.475Z" title="发表于 2025-01-24 11:07:24">2025-01-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/24/Post2-Rosetta-Ligand-docking/" title="Post2-Rosetta-Ligand_docking">Post2-Rosetta-Ligand_docking</a><time datetime="2025-01-23T16:00:00.000Z" title="发表于 2025-01-24 00:00:00">2025-01-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/01/24/Post-1Ubuntu%E4%B8%ADRosetta%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E7%BC%96%E8%AF%91/" title="Post-1  Ubuntu中Rosetta的安装与编译">Post-1  Ubuntu中Rosetta的安装与编译</a><time datetime="2025-01-23T16:00:00.000Z" title="发表于 2025-01-24 00:00:00">2025-01-24</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By GT-Kai</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
